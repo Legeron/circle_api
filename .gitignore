@@ -24,6 +24,9 @@
 /config/master.key
 .env*
 
+# Ignore cursor rules
+/.cursor/*
+
 /config/credentials/development.key
 
 /config/credentials/staging.key
