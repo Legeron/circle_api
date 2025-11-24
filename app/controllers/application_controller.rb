@@ -16,4 +16,8 @@ class ApplicationController < ActionController::Base
     flash[:alert] = "Vous n'êtes pas autorisé à réaliser cette action."
     redirect_to(root_path)
   end
+
+  def authenticate_admin!
+    redirect_to new_user_session_path unless current_user && current_user.admin?
+  end
 end

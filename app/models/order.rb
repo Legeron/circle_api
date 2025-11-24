@@ -35,6 +35,11 @@ class Order < ApplicationRecord
     "bon_de_livraison"                        => %w[commande_cloturee]
   }.freeze
 
+  # Ransackable attributes pour la recherche dans l'admin
+  def self.ransackable_attributes(auth_object = nil)
+    [ "buyer_id", "created_at", "id", "id_value", "note", "order_reference", "seller_id", "status", "updated_at" ]
+  end
+
   # Vérifie si une transition de statut est autorisée
   def allowed_transition?(to_status)
     from_status = status.to_s

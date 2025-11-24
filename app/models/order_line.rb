@@ -9,7 +9,7 @@ class OrderLine < ApplicationRecord
   end
 
   def is_valid
-    result = CircleValidatorService.new(circle_code, simulate_errors: true).call
+    result = CircleValidatorService.new(circle_code, simulate_errors: false).call
     errors.add(:base, result[:errors].to_json) unless result[:valid]
   end
 end
