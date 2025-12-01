@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get '/legal', to: 'pages#legal', as: 'legal'
+  get "/legal", to: "pages#legal", as: "legal"
   root to: "pages#home"
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
@@ -15,5 +15,16 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      # Validation "à blanc" (sans commande associée)
+      post "validation", to: "validations#validate"
+
+      # Commandes
+      resources :orders, only: [ :create, :update, :show, :index ]
+
+      # Catalogue produits (lecture seule)
+      resources :products, only: [ :index, :show ], param: :c10
+    end
+  end
 end

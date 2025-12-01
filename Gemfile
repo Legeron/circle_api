@@ -82,7 +82,8 @@ gem "rack-attack"
 gem "rack-cors"
 
 # Admin Panel
-gem "activeadmin", "~> 3.3"
+gem "activeadmin", "~> 4.0.0.beta19"
+gem "activeadmin_assets"
 
 # Doc & tests API
 gem "rswag-api"

@@ -1,0 +1,23 @@
+# app/views/api/v1/products/index.json.jbuilder
+json.array! @products do |product|
+  json.code product.code
+  json.label product.label
+  json.starting_vintage product.starting_vintage
+  json.late_vintage product.late_vintage
+  json.excluded_vintages product.excluded_vintages
+  json.family product.family
+  json.product_type product.product_type
+  json.product_complement product.product_complement
+  json.country product.country
+  json.region product.region
+  json.subregion product.subregion
+  json.origin_sign product.origin_sign
+  json.origin product.origin
+  json.mention product.mention
+  json.name product.name
+  json.label_complement product.label_complement
+  json.classification product.classification
+  json.classification_detail product.classification_detail
+  json.bottler product.bottler
+  json.color product.color
+end
