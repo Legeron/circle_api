@@ -1,19 +1,8 @@
 ActiveAdmin.register Order do
-  # Specify parameters which should be permitted for assignment
   permit_params :buyer_id, :note, :order_reference, :seller_id, :status
 
-  # or consider:
-  #
-  # permit_params do
-  #   permitted = [:buyer_id, :note, :order_reference, :seller_id, :status]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
-
-  # For security, limit the actions that should be available
   actions :all, except: []
 
-  # Add or remove filters to toggle their visibility
   filter :id
   filter :buyer_id
   filter :created_at
@@ -23,7 +12,6 @@ ActiveAdmin.register Order do
   filter :status
   filter :updated_at
 
-  # Add or remove columns to toggle their visibility in the index action
   index do
     selectable_column
     id_column
@@ -37,7 +25,6 @@ ActiveAdmin.register Order do
     actions
   end
 
-  # Add or remove rows to toggle their visibility in the show action
   show do
     attributes_table_for(resource) do
       row :id
@@ -63,7 +50,6 @@ ActiveAdmin.register Order do
     end
   end
 
-  # Add or remove fields to toggle their visibility in the form
   form do |f|
     f.semantic_errors(*f.object.errors.attribute_names)
     f.inputs do

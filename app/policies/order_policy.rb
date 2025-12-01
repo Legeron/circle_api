@@ -35,8 +35,7 @@ class OrderPolicy < ApplicationPolicy
     end
   end
 
-  # Déduis le rôle effectif de l'acteur sur CETTE commande
-  # Implémente ici ta logique: appariement clé API ↔ paire buyer/seller, etc.
+  # Définit le rôle l'utilisateur authentifié sur CETTE commande
   def actor_role
     return nil unless user.is_a?(Partner) && record
 

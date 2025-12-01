@@ -18,22 +18,7 @@ module Validations
     end
 
     def self.products_csv
-      @products_csv ||= begin
-        products = {}
-        CSV.foreach(PRODUCTS_CSV_PATH, headers: true) do |row|
-          c10 = row["C10"]
-          next if c10.nil? || c10.strip.empty?
-
-          products[c10] = Product.new(
-            code: c10,
-            label: row["Etiquette"] || c10,
-            starting_vintage: row["Premier millésime"],
-            late_vintage: row["Dernier Millésime"],
-            excluded_vintages: row["Millésime(s) non produit(s)"]
-          )
-        end
-        products
-      end
+      @products_csv ||= Product.all.index_by(&:code)
     end
 
     def initialize(code, value, rule, version, circle_values)
@@ -72,7 +57,6 @@ module Validations
       enum.keys
     end
 
-    # TO DO : this method has to be adapted depending on your own database scema
     def find_product
       self.class.products_csv[value]
     end
