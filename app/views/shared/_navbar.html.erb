@@ -1,26 +1,91 @@
-<div class="<%= yield(:navbar_classes)%>">
-  <div class="navbar">
-    <%= link_to root_path, class: 'navbar-brand' do %>
-      <%= image_tag "logo.png" %><span class="title d-none d-md-block">Mihivai</span>
-    <% end %>
+<% if current_page?(root_path) %>
+<div class="navbar-circle" data-controller="navbar" data-navbar-target="navbar">
+<% else %>
+<div class="navbar-circle" data-controller="navbar">
+<% end %>
+  <div class="d-block d-md-none flex-grow-1">
+    <div class="navbar-dropdown">
+      <input id="toggle" type="checkbox" data-navbar-target="toggle">
+      <label class="hamburger" for="toggle">
+        <div class="top"></div>
+        <div class="meat"></div>
+        <div class="bottom"></div>
+      </label>
 
-    <div class='d-flex align-items-center gap-3'>
-      <div class="nav-item dropdown">
-        <div class='avatar cursor-pointer d-none d-md-flex justify-content-center align-items-center' id="navbarDropdown" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
-          <%= svg_tag('pictos/avatar') %>
-        </div>
-
-        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-          <% if user_signed_in? %>
-            <%= link_to 'Se déconnecter', destroy_user_session_path, class: 'dropdown-item', data: { turbo_method: :delete } %>
-          <% else %>
-            <%= link_to 'Se connecter', new_user_session_path, class: 'dropdown-item'  %>
-          <% end %>
+      <div class="nav" data-navbar-target="mobileMenu">
+        <div class="nav-wrapper">
+          <nav>
+            <span class="mobile-menu-main" id="menu-mobile-first">Documentation</span>
+            <div class="documentation-menu-mobile">
+              
+          </nav>
         </div>
       </div>
-
     </div>
   </div>
 
-  <div style="height: 70px;"></div>
+  <!-- Logo -->
+  <a href="/" class="navbar-circle-brand">
+    <%= image_tag "logo.svg" %>
+  </a>
+  <div class="d-none d-md-block w-100">
+      <% if user_signed_in? %>
+        <div class="d-flex align-items-center justify-content-center navbar-circle-item navbar-circle-items">
+          <div class="flex-grow-1 d-flex justify-content-center navbar-circle-items-l">
+            <%= mail_to "contact@langagecircle.com", "Contacter l'équipe", class: "navbar-circle-item" %>
+          </div>
+          <div class="dropdown">
+            <%= image_tag "logo.svg", class: "avatar dropdown-toggle", id: "navbarDropdown", data: { bs_toggle: "dropdown" }, 'aria-haspopup': true, 'aria-expanded': false %>
+            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+              <div class="user-infos">
+                <div class="user-avatar">
+                  <%= image_tag "logo.svg", width: '35' %>
+                </div>
+                <div class="user-details">
+                  <div class="font-size-14px w-content"><%= current_user.email %></div>
+                </div>
+              </div>
+              <%= link_to "Editer mon compte", edit_user_registration_path, class: "dropdown-item" %>
+              <%= link_to "Me déconnecter", destroy_user_session_path, class: "dropdown-item", data: {turbo_method: :delete} %>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="d-flex align-items-center justify-content-end navbar-circle-items">
+          <%= link_to t(".sign_in", default: "Se connecter"), new_user_session_path , class: "btn btn-circle btn-outline-primary" %>
+          <%= link_to t(".sign_up", default: "S'inscrire"), new_user_registration_path , class: "btn btn-circle btn-primary"%>
+        </div>
+      <% end %>
+  </div>
+
+  <div class="d-block d-md-none flex-grow-1 text-end">
+    <% if user_signed_in? %>
+      <div class="dropdown">
+        <%= image_tag "logo.svg", class: "avatar dropdown-toggle", id: "navbarDropdown", data: { bs_toggle: "dropdown" }, 'aria-haspopup': true, 'aria-expanded': false %>
+        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+          <div class="user-infos">
+            <div class="user-avatar">
+              <%= image_tag "logo.svg", width: '35' %>
+            </div>
+            <div class="user-details">
+              <div class="font-size-14px w-content"><%= current_user.email %></div>
+            </div>
+          </div>
+          <%= link_to "Editer mon compte", edit_user_registration_path, class: "dropdown-item" %>
+          <%= link_to "Me déconnecter", destroy_user_session_path, class: "dropdown-item", data: {turbo_method: :delete} %>
+        </div>
+      </div>
+    <% else %>
+      <div class="dropdown">
+        <%= image_tag "logo.svg", class: "dropdown-toggle", id: "navbarDropdown", data: { bs_toggle: "dropdown" }, 'aria-haspopup': true, 'aria-expanded': false %>
+        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+          <%= link_to t(".sign_in", default: "Se connecter"), new_user_session_path, class: "dropdown-item border-top-0" %>
+          <%= link_to t(".sign_up", default: "S'inscrire"), new_user_registration_path, data: {turbo_method: :delete}, class: "dropdown-item" %>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
 </div>
+
+<div style="height: 76px;"></div>

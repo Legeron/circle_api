@@ -1,36 +1,40 @@
-$fonts: 14px 16px 18px 20px 24px 30px 32px 36px 48px;
+// Import external fonts
+@import url("https://fonts.cdnfonts.com/css/cabinet-grotesk?styles=134955");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@700&family=Inter:wght@400;600&display=swap");
 
-@each $font in $fonts {
-  .font-size-#{$font} {
-    font-size: $font !important;
+$body-font: "Inter", sans-serif;
+$headers-font: "Inter", sans-serif;
+$main-header-font: "Cabinet Grotesk", sans-serif;
+$code-font: "IBM Plex Mono", monospace;
+
+$font-sizes: 12px 14px 16px 18px 20px 22px 24px 26px 28px 30px 32px 36px 40px
+  48px 60px;
+
+@each $font-size in $font-sizes {
+  .font-size-#{$font-size} {
+    font-size: $font-size !important;
   }
-
-  @media(min-width:768px) {
-    .font-size-md-#{$font} {
-      font-size: $font !important;
+  @media (min-width: 768px) {
+    .font-size-md-#{$font-size} {
+      font-size: $font-size !important;
     }
   }
-
-  @media(min-width:992px) {
-    .font-size-lg-#{$font} {
-      font-size: $font !important;
+  @media (min-width: 992px) {
+    .font-size-lg-#{$font-size} {
+      font-size: $font-size !important;
     }
   }
-
-  @media(min-width:1200px) {
-    .font-size-xl-#{$font} {
-      font-size: $font !important;
+  @media (min-width: 1200px) {
+    .font-size-xl-#{$font-size} {
+      font-size: $font-size !important;
     }
   }
-
-  @media(min-width:1400px) {
-    .font-size-xxl-#{$font} {
-      font-size: $font !important;
+  @media (min-width: 1400px) {
+    .font-size-xxl-#{$font-size} {
+      font-size: $font-size !important;
     }
   }
-
 }
-
 
 $weights: 400 500 600;
 
@@ -39,28 +43,27 @@ $weights: 400 500 600;
     font-weight: $weight !important;
   }
 
-  @media(min-width:768px) {
+  @media (min-width: 768px) {
     .fw-md-#{$weight} {
       font-weight: $weight !important;
     }
   }
 
-  @media(min-width:992px) {
+  @media (min-width: 992px) {
     .fw-lg-#{$weight} {
       font-weight: $weight !important;
     }
   }
 
-  @media(min-width:1200px) {
+  @media (min-width: 1200px) {
     .fw-xl-#{$weight} {
       font-weight: $weight !important;
     }
   }
 
-  @media(min-width:1400px) {
+  @media (min-width: 1400px) {
     .fw-xxl-#{$weight} {
       font-weight: $weight !important;
     }
   }
-
 }
