@@ -2,13 +2,13 @@
 
 class OrderPolicy < ApplicationPolicy
   BUYER_ONLY  = %w[
+    nouvelle_commande
     demande_de_mise_et_logistique_en_cours
     details_de_mise_et_logistique_confirmes
     commande_cloturee
   ].freeze
 
   SELLER_ONLY = %w[
-    nouvelle_commande
     en_attente_demande_de_mise
     bon_de_commande
     mise_a_disposition
