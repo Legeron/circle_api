@@ -47,26 +47,26 @@ class Api::V1::OrdersController < Api::BaseController
     end
 
     order_lines_in_params = params.dig(:order, :order_lines_attributes)
-    
+
     if order_lines_in_params
       # Vérifier si les order_lines peuvent être modifiées selon le statut actuel
       unless policy.can_modify_order_lines?
         render json: { error: "Forbidden : Les order_lines ne peuvent pas être modifiées pour ce statut" }, status: :forbidden
         return
       end
-      
+
       # Stocker les volumes originaux AVANT toute modification
       @order.prepare_order_lines_replacement
-      
+
       # Sauvegarder les order_lines originales pour restauration en cas d'erreur
       original_order_lines_ids = @order.order_lines.pluck(:id)
-      
+
       # Créer temporairement les nouvelles order_lines pour validation (sans toucher aux anciennes)
       new_order_lines_data = order_params[:order_lines_attributes] || []
       temp_order_lines = new_order_lines_data.map do |attrs|
         OrderLine.new(order: @order, circle_code: attrs[:circle_code])
       end
-      
+
       # Valider les nouvelles order_lines individuellement
       temp_order_lines.each(&:valid?)
       temp_order_lines.each do |line|
@@ -74,16 +74,16 @@ class Api::V1::OrdersController < Api::BaseController
           @order.errors.add(:order_lines, "#{error.attribute}: #{error.message}")
         end
       end
-      
+
       # Remplacer temporairement l'association pour la validation de l'order
       # (sans toucher à la base de données)
       original_order_lines = @order.order_lines.to_a
       @order.association(:order_lines).target = temp_order_lines
-      
+
       # Assigner les autres attributs
       update_params = order_params.except(:order_lines_attributes)
       @order.assign_attributes(update_params)
-      
+
       # Valider l'order avec les nouvelles order_lines temporaires
       unless @order.valid?
         # Restaurer l'association originale en cas d'erreur
@@ -92,29 +92,29 @@ class Api::V1::OrdersController < Api::BaseController
         render json: { errors: format_errors(@order) }, status: :unprocessable_entity
         return
       end
-      
+
       # Si validation réussit, remplacer dans une transaction
       Order.transaction do
         # Supprimer les anciennes order_lines
         OrderLine.where(id: original_order_lines_ids).destroy_all
-        
+
         # Réinitialiser l'association pour éviter les conflits
         @order.association(:order_lines).reset
-        
+
         # Créer les nouvelles order_lines
         new_order_lines_data.each do |attrs|
           @order.order_lines.create!(circle_code: attrs[:circle_code])
         end
-        
+
         # Sauvegarder les autres attributs de l'order
         @order.save!
       end
-      
+
       render json: { order: @order.reload }, status: :ok
     else
       # Pas de modification des order_lines, mise à jour normale
       update_params = order_params.except(:order_lines_attributes)
-      
+
       if @order.update(update_params)
         render json: { order: @order }, status: :ok
       else

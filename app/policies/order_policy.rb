@@ -42,17 +42,17 @@ class OrderPolicy < ApplicationPolicy
   # Vérifie si les order_lines peuvent être modifiées
   def can_modify_order_lines?
     return false unless record
-    
+
     current_status = record.status.to_s
-    
+
     # Si le statut est verrouillé, personne ne peut modifier
     return false if ORDER_LINES_LOCKED_STATUSES.include?(current_status)
-    
+
     # Si le statut nécessite que ce soit le seller, vérifier le rôle
     if ORDER_LINES_SELLER_ONLY_STATUSES.include?(current_status)
       return actor_role == :seller
     end
-    
+
     # Sinon, autoriser si c'est le buyer ou le seller
     actor_role == :buyer || actor_role == :seller
   end
