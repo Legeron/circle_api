@@ -1,50 +1,48 @@
-$sizes: 16px 20px 24px 40px 80px 100px 125px 75vh auto;
+$sizes: 16px 20px 24px 140px 270px 430px 500px 600px 768px 800px 990px;
 
 @each $size in $sizes {
   .height-#{$size} {
-    height: $size !important;
+    height: $size;
   }
-
   .width-#{$size} {
-    width: $size !important;
+    width: $size;
   }
-
   .max-height-#{$size} {
-    max-height: $size !important;
+    max-height: $size;
   }
-
   .max-width-#{$size} {
-    max-width: $size !important;
+    max-width: $size;
   }
-
   .min-height-#{$size} {
-    min-height: $size !important;
+    min-height: $size;
   }
-
   .min-width-#{$size} {
-    min-width: $size !important;
-  }
-
-  @media(min-width:768px) {
-    .width-md-#{$size} {
-      width: $size !important;
-    }
+    min-width: $size;
   }
 }
-
+.w-md-content {
+  @media (min-width: map-get($grid-breakpoints, md)) {
+    width: fit-content;
+  }
+}
 .page-min-height {
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - 76px);
 }
-
 .mw-58 {
   max-width: 58%;
 }
-
 .py-50px {
   padding-top: 50px;
   padding-bottom: 50px;
 }
-
 .mb-2pc {
   margin-bottom: 2pc !important;
+}
+
+$radiuses: 8px 12px 16px;
+
+@each $radius in $radiuses {
+  .border-radius-#{$radius} {
+    border-radius: $radius;
+  }
 }

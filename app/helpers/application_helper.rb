@@ -2,9 +2,9 @@ module ApplicationHelper
   def svg_tag(name)
     file_path = "#{Rails.root}/app/assets/images/#{name}.svg"
     if File.exist?(file_path)
-       File.read(file_path).html_safe
+      File.read(file_path).html_safe
     else
-      '(not found)'
+      "(not found)"
     end
   end
 

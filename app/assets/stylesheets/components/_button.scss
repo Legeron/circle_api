@@ -1,0 +1,48 @@
+.btn-circle.btn-transparent {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: $white;
+  transition: all 0.3s ease;
+}
+.btn-circle.btn-transparent:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: $white;
+}
+.btn-circle.btn-secondary {
+  color: $white;
+}
+.btn-circle.btn-light {
+  border: 1px solid #d0d5dd;
+}
+.btn-circle.btn-light:hover {
+  background-color: transparent;
+  color: $white;
+  transition: all 0.3 ease;
+}
+.btn-circle.btn-light-contrast:hover {
+  background-color: transparent;
+  color: $green;
+  transition: all 0.3 ease;
+}
+
+// Button green style
+.btn-green {
+  background-color: $green;
+  color: $white;
+  border: none;
+}
+
+.btn-green:hover {
+  background-color: darken($green, 5%);
+  color: $white;
+}
+
+.btn-outline-primary {
+  border-color: $green;
+  color: $green;
+}
+
+.btn-outline-primary:hover {
+  background-color: $green;
+  color: $white;
+}
+
