@@ -4,7 +4,8 @@
 @import "config/variables";
 
 // External libraries
-@import "bootstrap";
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons";
 @import "config/sizing";
 
 // Your CSS partials

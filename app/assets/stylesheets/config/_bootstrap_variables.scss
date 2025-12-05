@@ -1,20 +1,80 @@
-// General style
+// This is where you override default Bootstrap variables
+// 1. All Bootstrap variables are here => https://github.com/twbs/bootstrap/blob/master/scss/_variables.scss
+// 2. These variables are defined with default value (see https://robots.thoughtbot.com/sass-default)
+// 3. You can override them below!
 
+// General style
+$font-family-sans-serif: $body-font;
+$headings-font-family: $headers-font;
+$body-bg: $white;
+$font-size-base: 1rem;
+
+// Colors
+$body-color: $grey;
+$primary: $green;
+$success: $green-light;
+$warning: $orange;
+$white: $white;
+$secondary: $orange;
+$grey-dark: $grey-dark;
+$grey-light: $grey-light;
+$grey: $grey;
+$grey-blue: $grey-blue;
+$grey-body: $grey;
+$orange: $orange;
+$orange-light: $orange-light;
+$black: $grey-dark;
+$light: $white;
+$yellow: $yellow;
+$red: $red;
+$blue: $blue;
+$white-grey: $white-grey;
+$grey-lighter: $grey-lighter;
+
+$btn-padding-y: 10px;
+$btn-padding-x: 18px;
+$btn-border-radius: 6px;
+
+$headings-color: $grey;
+$headings-font-weight: 600;
+
+$grid-gutter-width: 2rem;
+
+.rounded-md-4 {
+  @media (min-width: 768px) {
+    border-radius: 1rem;
+  }
+}
 
 $theme-colors: (
-  "grey-blue": $grey-blue,
+  "light": $light,
+  "primary": $primary,
+  "success": $green,
+  "info": $yellow,
+  "warning": $orange,
+  "danger": $red,
+  "white": $white,
+  "secondary": $secondary,
+  "grey-body": $grey-body,
+  "grey-dark": $grey-dark,
   "grey": $grey,
+  "grey-blue": $grey-blue,
+  "grey-light": $grey-light,
   "green": $green,
-  "notice": $notice,
-  "danger": $danger
+  "green-light": $green-light,
+  "yellow": $yellow,
+  "pink": $pink,
+  "orange": $orange,
+  "orange-light": $orange-light,
+  "white-grey": $white-grey,
+  "grey-lighter": $grey-lighter,
 );
 
 $spacer: 1rem;
 $spacers: (
   0: 0,
-  1: $spacer * .25,
-  2: $spacer * .5,
-  '075': $spacer * .75,
+  1: $spacer * 0.25,
+  2: $spacer * 0.5,
   3: $spacer,
   4: $spacer * 1.5,
   5: $spacer * 2,
@@ -25,6 +85,6 @@ $spacers: (
   10: $spacer * 6,
   // 11: $spacer * 7,
   12: $spacer * 8,
-  13: $spacer * 9,
-  14: $spacer * 10
+  // 13: $spacer * 9,
+  14: $spacer * 10,
 );

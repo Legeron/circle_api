@@ -4,17 +4,54 @@ body {
   min-height: 100vh;
 }
 
-.bg-cover {
-  background-size: cover;
+.rounded-4 {
+  border-radius: 1rem;
 }
-
-.text-ellipsis {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  max-width: 100%;
-}
-
 .cursor-pointer {
   cursor: pointer;
+}
+.text-ellipsis {
+  text-overflow: ellipsis;
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.scrollable-div {
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+@each $color-name, $color-value in $theme-colors {
+  .hover-#{$color-name} {
+    &:hover {
+      background-color: $color-value;
+    }
+  }
+}
+
+pre {
+  line-height: 1.2em;
+  background: rgb(51, 51, 51);
+  background-size: 2.4em 2.4em;
+  background-origin: content-box;
+  color: rgb(162, 252, 162);
+  overflow-x: auto;
+  padding: 0.5rem;
+  font-family: monospace;
+  font-weight: 400;
+  font-size: 12px;
+}
+.text-justify {
+  text-align: justify !important;
+}
+.text-underline-hover {
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+code {
+  color: $orange;
 }
