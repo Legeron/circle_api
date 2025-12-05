@@ -49,6 +49,12 @@ class Api::V1::OrdersController < Api::BaseController
     order_lines_in_params = params.dig(:order, :order_lines_attributes)
     
     if order_lines_in_params
+      # Vérifier si les order_lines peuvent être modifiées selon le statut actuel
+      unless policy.can_modify_order_lines?
+        render json: { error: "Forbidden : Les order_lines ne peuvent pas être modifiées pour ce statut" }, status: :forbidden
+        return
+      end
+      
       # Stocker les volumes originaux AVANT toute modification
       @order.prepare_order_lines_replacement
       

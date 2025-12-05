@@ -21,6 +21,7 @@ class Order < ApplicationRecord
   before_validation :store_original_total_volume, on: :update, prepend: true
 
   enum :status, {
+    annulee: 0,
     nouvelle_commande: 1,
     en_attente_demande_de_mise: 2,
     demande_de_mise_et_logistique_en_cours: 3,
@@ -28,8 +29,7 @@ class Order < ApplicationRecord
     bon_de_commande: 5,
     mise_a_disposition: 6,
     bon_de_livraison: 7,
-    commande_cloturee: 8,
-    annulee: 9
+    commande_cloturee: 8
   }
 
   ALLOWED_TRANSITIONS = {
