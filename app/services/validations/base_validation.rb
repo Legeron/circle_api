@@ -61,7 +61,7 @@ module Validations
       if value.is_a?(Array)
         value.map { |v| self.class.products_csv[v] }
       else
-        self.class.products_csv[value].to_a
+        [ self.class.products_csv[value] ]
       end
     end
 
