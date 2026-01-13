@@ -5,10 +5,7 @@
   },
   "CLE": {
     "name": "Key",
-    "validations": [
-      { "type": "single_value" },
-      { "type": "key_validation" }
-    ]
+    "validations": [{ "type": "single_value" }, { "type": "key_validation" }]
   },
   "C1": {
     "name": "Case",
@@ -86,7 +83,7 @@
     "name": "Vintage",
     "validations": [
       {
-        "type": "forbidden_value",
+        "type": "forbidden_value_if_casket",
         "forbidden_values": ["00"]
       },
       { "type": "single_value" },
@@ -113,7 +110,7 @@
       { "type": "single_value" },
       { "type": "in_database" },
       {
-        "type": "forbidden_value",
+        "type": "forbidden_value_if_casket",
         "forbidden_values": ["00"]
       },
       {
@@ -137,6 +134,7 @@
     "name": "EmptyBottleWeight",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -147,6 +145,7 @@
     "name": "FullBottleWeight",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -157,6 +156,7 @@
     "name": "BottleHeight",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -167,6 +167,7 @@
     "name": "BottleDiameter",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -177,6 +178,7 @@
     "name": "NeckBottleDiameter",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -198,6 +200,10 @@
           ["B0", "/(00|B1)/"],
           ["B1", "/(00|B0)/"]
         ]
+      },
+      {
+        "type": "casket_value",
+        "allowed_values": ["00"]
       },
       { "type": "in_database" }
     ]
@@ -228,6 +234,7 @@
     "name": "LabelLenght",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -238,6 +245,7 @@
     "name": "LabelWidth",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -248,6 +256,7 @@
     "name": "BackLabelLenght",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -258,6 +267,7 @@
     "name": "BackLabelWidth",
     "validations": [
       { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
       {
         "type": "casket_value",
         "match_c2_length": true
@@ -293,6 +303,10 @@
         "type": "match_other_code_length",
         "source_code": "C26"
       },
+      {
+        "type": "casket_value",
+        "allowed_values": ["00"]
+      },
       { "type": "in_database" }
     ]
   },
@@ -316,6 +330,10 @@
         "source_code": "C26"
       },
       {
+        "type": "casket_value",
+        "allowed_values": ["00"]
+      },
+      {
         "type": "match_pattern",
         "pattern_name": "year_yyyy"
       }
@@ -331,6 +349,10 @@
           ["00", "/./"],
           ["A0", "/./"]
         ]
+      },
+      {
+        "type": "casket_value",
+        "allowed_values": ["00"]
       },
       { "type": "in_database" },
       {
@@ -353,7 +375,7 @@
       { "type": "single_value" },
       { "type": "in_database" },
       {
-        "type": "forbidden_value",
+        "type": "forbidden_value_if_casket",
         "forbidden_values": ["00"]
       },
       {
@@ -364,11 +386,20 @@
   },
   "C31": {
     "name": "Volume",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" }
+    ]
   },
   "C32A": {
     "name": "BatchNumber",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C33B": {
     "name": "TraceabilityNumber",
@@ -512,6 +543,12 @@
     "name": "DateCertificate",
     "validations": [
       {
+        "type": "excluded_combinations",
+        "excluded_combinations": [
+          ["00", "/./"]
+        ]
+      },
+      {
         "type": "casket_value",
         "allowed_values": ["00"]
       },
@@ -618,6 +655,12 @@
     "name": "DateEstateCertificate",
     "validations": [
       {
+        "type": "excluded_combinations",
+        "excluded_combinations": [
+          ["00", "/./"]
+        ]
+      },
+      {
         "type": "casket_value",
         "allowed_values": ["00"]
       },
@@ -636,6 +679,10 @@
       {
         "type": "match_other_code_length",
         "source_code": "C44"
+      },
+      {
+        "type": "match_pattern",
+        "pattern_name": "date_yyyymmdd"
       }
     ]
   },
@@ -691,6 +738,10 @@
       },
       {
         "type": "casket_value",
+        "allowed_values": ["00"]
+      },
+      {
+        "type": "casket_value",
         "match_c2_length": true
       },
       { "type": "in_database" }
@@ -720,6 +771,7 @@
   "C52E": {
     "name": "SpecificBackLabelBat",
     "validations": [
+      { "type": "single_value" },
       {
         "type": "match_pattern",
         "pattern_name": "url_https"
@@ -729,6 +781,7 @@
   "C53F": {
     "name": "TechnicalSheetUrl",
     "validations": [
+      { "type": "single_value" },
       {
         "type": "match_pattern",
         "pattern_name": "url_https"
@@ -738,6 +791,7 @@
   "C54G": {
     "name": "ExportAnalysisUrl",
     "validations": [
+      { "type": "single_value" },
       {
         "type": "match_pattern",
         "pattern_name": "url_https"
@@ -747,6 +801,7 @@
   "C55H": {
     "name": "CertificateUrl",
     "validations": [
+      { "type": "single_value" },
       {
         "type": "match_pattern",
         "pattern_name": "url_https"
@@ -756,6 +811,7 @@
   "C56I": {
     "name": "PhotosUrl",
     "validations": [
+      { "type": "single_value" },
       {
         "type": "match_pattern",
         "pattern_name": "url_https"
@@ -765,6 +821,7 @@
   "C57J": {
     "name": "PackagingVisualUrl",
     "validations": [
+      { "type": "single_value" },
       {
         "type": "match_pattern",
         "pattern_name": "url_https"
@@ -774,6 +831,7 @@
   "C58K": {
     "name": "CertificateOriginUrl",
     "validations": [
+      { "type": "single_value" },
       {
         "type": "match_pattern",
         "pattern_name": "url_https"
@@ -786,15 +844,24 @@
   },
   "C60": {
     "name": "PalletVolume",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" }
+    ]
   },
   "C61": {
     "name": "PalletWeight",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" }
+    ]
   },
   "C62": {
     "name": "PalletHeight",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" }
+    ]
   },
   "C63L": {
     "name": "Fda",
@@ -814,47 +881,122 @@
   },
   "C67O": {
     "name": "ListOfIngredient",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C68": {
     "name": "EnergeticValueKj",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C69": {
     "name": "EnergeticValueKcal",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C70": {
     "name": "Fat",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C71": {
     "name": "Protein",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C72": {
     "name": "Salt",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C73": {
     "name": "Carbohydrate",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C74": {
     "name": "Sugar",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C75": {
     "name": "SaturatedFattyAcid",
-    "validations": [{ "type": "single_value" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "match_pattern", "pattern_name": "numeric" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C76": {
     "name": "QrCodeNutriInfo",
-    "validations": [{ "type": "single_value" }, { "type": "in_database" }]
+    "validations": [
+      { "type": "single_value" },
+      { "type": "in_database" },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
+      }
+    ]
   },
   "C77P": {
     "name": "QrCodeUrl",
     "validations": [
+      {
+        "type": "excluded_combinations",
+        "excluded_combinations": [
+          ["00", "/./"]
+        ]
+      },
       { "type": "single_value" },
       {
         "type": "match_pattern",
@@ -865,6 +1007,12 @@
   "C78": {
     "name": "BottleSizeAvailable",
     "validations": [
+      {
+        "type": "excluded_combinations",
+        "excluded_combinations": [
+          ["00", "/./"]
+        ]
+      },
       { "type": "duplicate_value" },
       {
         "type": "casket_value",
@@ -876,6 +1024,12 @@
   "C79": {
     "name": "CaseAvailable",
     "validations": [
+      {
+        "type": "excluded_combinations",
+        "excluded_combinations": [
+          ["00", "/./"]
+        ]
+      },
       {
         "type": "in_database_combination",
         "combination_codes": ["C1", "C2", "C3"],
@@ -896,6 +1050,12 @@
   "C80": {
     "name": "CaseByDefault",
     "validations": [
+      {
+        "type": "excluded_combinations",
+        "excluded_combinations": [
+          ["00", "/./"]
+        ]
+      },
       {
         "type": "in_database_combination",
         "combination_codes": [
