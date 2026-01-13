@@ -11,6 +11,7 @@ class CircleValidatorService
     "casket_value"            => Validations::CasketValueValidation,
     "dependency"              => Validations::DependencyValidation,
     "match_value"             => Validations::MatchValueValidation,
+    "match_other_code_length" => Validations::MatchOtherCodeLengthValidation,
     "duplicate_value"         => Validations::DuplicateValueValidation,
     "numeric_value"           => Validations::NumericValueValidation,
     "in_database"             => Validations::InDatabaseValidation,

@@ -250,7 +250,7 @@
     "validations": [
       {
         "type": "casket_value",
-        "match_c2_length": true
+        "allowed_values": ["00"]
       },
       { "type": "in_database" }
     ]
@@ -271,10 +271,9 @@
         "target_value": "00"
       },
       {
-        "type": "casket_value",
-        "allowed_values": ["00"]
+        "type": "match_other_code_length",
+        "source_code": "C26"
       },
-      { "type": "single_value" },
       { "type": "in_database" }
     ]
   },
@@ -622,6 +621,10 @@
           ["00", "/./"],
           ["A0", "/./"]
         ]
+      },
+      {
+        "type": "casket_value",
+        "match_c2_length": true
       },
       { "type": "in_database" }
     ]
