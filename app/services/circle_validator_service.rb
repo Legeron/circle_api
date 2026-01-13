@@ -10,7 +10,7 @@ class CircleValidatorService
     "excluded_combinations"   => Validations::ExcludedCombinationsValidation,
     "casket_value"            => Validations::CasketValueValidation,
     "dependency"              => Validations::DependencyValidation,
-    "match_value"             => Validations::MatchValueValidation,
+    "match_pattern"           => Validations::MatchPatternValidation,
     "match_other_code_length" => Validations::MatchOtherCodeLengthValidation,
     "duplicate_value"         => Validations::DuplicateValueValidation,
     "numeric_value"           => Validations::NumericValueValidation,

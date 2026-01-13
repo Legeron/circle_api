@@ -1,8 +1,8 @@
-# app/services/validations/match_value_validation.rb
+# app/services/validations/match_pattern_validation.rb
 require_relative "base_validation"
 
 module Validations
-  class MatchValueValidation < BaseValidation
+  class MatchPatternValidation < BaseValidation
     def validate
       pattern = rule["pattern"]
       regex = Regexp.new(pattern)
@@ -16,7 +16,7 @@ module Validations
     end
 
     def default_error_message(code)
-      "Erreur de match_value sur #{code}."
+      "Erreur de match_pattern sur #{code}."
     end
   end
 end
