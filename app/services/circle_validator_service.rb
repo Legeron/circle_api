@@ -15,7 +15,8 @@ class CircleValidatorService
     "duplicate_value"         => Validations::DuplicateValueValidation,
     "in_database"             => Validations::InDatabaseValidation,
     "in_database_combination" => Validations::InDatabaseCombinationValidation,
-    "product_validation"      => Validations::ProductValidation
+    "product_validation"      => Validations::ProductValidation,
+    "key_validation"          => Validations::KeyValidation
   }
 
   CONFIG_JSON = File.read(Rails.root.join("specs", "circle_validation_rules.json"))

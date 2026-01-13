@@ -3,6 +3,13 @@
     "name": "Version",
     "validations": [{ "type": "single_value" }, { "type": "in_database" }]
   },
+  "CLE": {
+    "name": "Key",
+    "validations": [
+      { "type": "single_value" },
+      { "type": "key_validation" }
+    ]
+  },
   "C1": {
     "name": "Case",
     "validations": [{ "type": "single_value" }, { "type": "in_database" }]
