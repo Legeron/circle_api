@@ -11,8 +11,8 @@ class Order < ApplicationRecord
             format: { with: URI::DEFAULT_PARSER.make_regexp(%w[https]), message: "doit être une url https valide" },
             allow_blank: true
 
-  validate :latest_instruction_due_date_must_be_future_or_today
-  validate :estimated_availability_earliest_at_must_be_future_or_today
+  validate :latest_instruction_due_date_must_be_future_or_today, on: :create
+  validate :estimated_availability_earliest_at_must_be_future_or_today, on: :create
   validate :status_must_be_nouvelle_commande_on_create, on: :create
   validate :total_volume_cannot_change_on_update, on: :update
   validate :order_reference_cannot_change_on_update, on: :update
