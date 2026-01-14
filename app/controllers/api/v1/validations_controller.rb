@@ -140,9 +140,78 @@ class Api::V1::ValidationsController < Api::BaseController
       # Cas particulier : produits
       map_product_label_value(value)
     else
-      # Cas général : déterminer quel dictionnaire utiliser
-      dictionary_entry = get_dictionary_entry_for_mapping(code_str, validation_rules, dictionary)
-      map_enum_value(value, dictionary_entry)
+      # Vérifier si c'est une validation in_database_combination
+      combination_info = get_combination_info(code_str, validation_rules)
+
+      if combination_info
+        # Mapper avec les codes de la combinaison
+        map_combination_value(value, combination_info[:codes], combination_info[:mode], dictionary)
+      else
+        # Cas général : déterminer quel dictionnaire utiliser
+        dictionary_entry = get_dictionary_entry_for_mapping(code_str, validation_rules, dictionary)
+        map_enum_value(value, dictionary_entry)
+      end
+    end
+  end
+
+  # Détecte si un code a une validation in_database_combination et retourne les infos
+  def get_combination_info(code_str, validation_rules)
+    code_rules = validation_rules[code_str]
+
+    if code_rules && code_rules["validations"]
+      combination_validation = code_rules["validations"].find do |rule|
+        rule["type"] == "in_database_combination" && rule["combination_codes"]
+      end
+
+      if combination_validation
+        return {
+          codes: combination_validation["combination_codes"],
+          mode: combination_validation["combinaison_mode"] || "combined_codes"
+        }
+      end
+    end
+
+    nil
+  end
+
+  # Mappe les valeurs de combinaisons selon leur position dans combination_codes
+  def map_combination_value(value, combination_codes, mode, dictionary)
+    if mode == "single_code"
+      # Mode single_code : array plat où chaque position correspond à un code
+      # Certaines positions peuvent contenir des arrays (ex: C5, C20 dans C80)
+      if value.is_a?(Array) && value.size == combination_codes.size
+        value.each_with_index.map do |val, idx|
+          code = combination_codes[idx]
+          dictionary_entry = dictionary[code]
+          # Si val est un array, mapper chaque élément
+          map_enum_value(val, dictionary_entry)
+        end
+      else
+        # Taille incorrecte ou pas un array : retourner tel quel
+        value
+      end
+    else
+      # Mode combined_codes (défaut) : structure imbriquée
+      if value.is_a?(Array)
+        # Vérifier si c'est une combinaison simple (array de taille = combination_codes.size)
+        # et que tous les éléments sont des scalaires
+        if value.size == combination_codes.size && value.none? { |v| v.is_a?(Array) }
+          # C'est une combinaison simple : mapper chaque position
+          value.each_with_index.map do |val, idx|
+            code = combination_codes[idx]
+            dictionary_entry = dictionary[code]
+            map_enum_value(val, dictionary_entry)
+          end
+        else
+          # C'est un array imbriqué : mapper récursivement
+          value.map do |item|
+            map_combination_value(item, combination_codes, mode, dictionary)
+          end
+        end
+      else
+        # Valeur simple : retourner telle quelle (ne devrait pas arriver)
+        value
+      end
     end
   end
 end

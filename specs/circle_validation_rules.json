@@ -342,7 +342,6 @@
   "C29": {
     "name": "BottlePackagingReward",
     "validations": [
-      { "type": "single_value" },
       {
         "type": "excluded_combinations",
         "excluded_combinations": [
@@ -571,7 +570,6 @@
   "C43": {
     "name": "PackagingCertification",
     "validations": [
-      { "type": "single_value" },
       {
         "type": "excluded_combinations",
         "excluded_combinations": [
@@ -601,7 +599,6 @@
   "C44": {
     "name": "EstateCertificationOrganism",
     "validations": [
-      { "type": "single_value" },
       {
         "type": "excluded_combinations",
         "excluded_combinations": [
@@ -1029,6 +1026,10 @@
         "combinaison_mode": "combined_codes"
       },
       {
+        "type": "match_other_code_length",
+        "source_code": "C78"
+      },
+      {
         "type": "casket_value",
         "allowed_values": ["00"]
       },
@@ -1044,8 +1045,17 @@
     "name": "CaseByDefault",
     "validations": [
       {
-        "type": "excluded_combinations",
-        "excluded_combinations": [["00", "/./"]]
+        "type": "combination_position_value",
+        "position_index": 3,
+        "position_code": "C4",
+        "allowed_values": ["A0", "00"]
+      },
+      {
+        "type": "combination_conditional_all_same",
+        "trigger_position": 5,
+        "trigger_code": "C13",
+        "trigger_value": "00",
+        "required_value": "00"
       },
       {
         "type": "in_database_combination",

@@ -5,18 +5,20 @@ class CircleValidatorService
   attr_reader :circle_values, :config, :errors, :version
 
   VALIDATION_CLASSES = {
-    "single_value"                => Validations::SingleValueValidation,
-    "forbidden_value_if_casket"   => Validations::ForbiddenValueIfCasketValidation,
-    "excluded_combinations"       => Validations::ExcludedCombinationsValidation,
-    "casket_value"                => Validations::CasketValueValidation,
-    "dependency"                  => Validations::DependencyValidation,
-    "match_pattern"               => Validations::MatchPatternValidation,
-    "match_other_code_length"     => Validations::MatchOtherCodeLengthValidation,
-    "duplicate_value"             => Validations::DuplicateValueValidation,
-    "in_database"                 => Validations::InDatabaseValidation,
-    "in_database_combination"     => Validations::InDatabaseCombinationValidation,
-    "product_validation"          => Validations::ProductValidation,
-    "key_validation"              => Validations::KeyValidation
+    "single_value"                       => Validations::SingleValueValidation,
+    "forbidden_value_if_casket"          => Validations::ForbiddenValueIfCasketValidation,
+    "excluded_combinations"              => Validations::ExcludedCombinationsValidation,
+    "casket_value"                       => Validations::CasketValueValidation,
+    "dependency"                         => Validations::DependencyValidation,
+    "match_pattern"                      => Validations::MatchPatternValidation,
+    "match_other_code_length"            => Validations::MatchOtherCodeLengthValidation,
+    "duplicate_value"                    => Validations::DuplicateValueValidation,
+    "in_database"                        => Validations::InDatabaseValidation,
+    "in_database_combination"            => Validations::InDatabaseCombinationValidation,
+    "product_validation"                 => Validations::ProductValidation,
+    "key_validation"                     => Validations::KeyValidation,
+    "combination_position_value"         => Validations::CombinationPositionValueValidation,
+    "combination_conditional_all_same"   => Validations::CombinationConditionalAllSameValidation
   }
 
   CONFIG_JSON = File.read(Rails.root.join("specs", "circle_validation_rules.json"))
