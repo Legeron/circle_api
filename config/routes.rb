@@ -6,13 +6,15 @@ Rails.application.routes.draw do
   ActiveAdmin.routes(self) rescue ActiveAdmin::DatabaseHitDuringLoad
   devise_for :users
 
+  get "/api-docs", to: "swagger_ui#index"
+
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       # Validation "à blanc" (sans commande associée)
       post "validation", to: "validations#validate"
 
       # Commandes
-      resources :orders, only: [ :create, :update, :show, :index ]
+      resources :orders, only: [ :create, :update ]
 
       # Catalogue produits (lecture seule)
       resources :products, only: [ :index, :show ], param: :c10
