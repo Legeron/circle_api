@@ -4,8 +4,10 @@ class SwaggerUiController < ApplicationController
   skip_after_action :verify_authorized
 
   def index
+    spec_content = YAML.load_file(Rails.root.join("specs", "openapi.yaml"))
+
     @config_object = {
-      url: "/openapi/api.yaml",
+      url: spec_content,
       dom_id: "#swagger-ui",
       validatorUrl: nil
     }

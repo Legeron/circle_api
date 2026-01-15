@@ -1,0 +1,925 @@
+openapi: 3.0.3
+info:
+  title: Circle API
+  description: |
+    API pour la gestion et la validation des données Circle (codes produits vins).
+
+    ## Authentification
+    Toutes les requêtes nécessitent un token Bearer fourni par un partenaire autorisé.
+
+    ## Concepts clés
+    - **Circle Codes** : Ensemble de codes (C0, C1, C2, etc.) décrivant un produit vin
+    - **Circle Key (CLE)** : Clé de contrôle calculée à partir des circle codes
+    - **Order** : Commande passée entre un acheteur et un vendeur
+    - **Order Lines** : Lignes de commande contenant les circle codes
+
+  version: 1.0.0
+  contact:
+    name: Code4Good
+
+servers:
+  - url: http://localhost:3000
+    description: Serveur de développement
+  - url: https://api.circle.example.com
+    description: Serveur de production
+
+tags:
+  - name: Validation
+    description: Validation de circle codes sans commande associée
+  - name: Orders
+    description: Gestion des commandes (CRUD)
+  - name: Products
+    description: Consultation du catalogue produits
+  - name: Circle Values
+    description: Recherche enrichie de valeurs Circle
+
+security:
+  - BearerAuth: []
+
+paths:
+  /api/v1/validation:
+    post:
+      tags:
+        - Validation
+      summary: Valider des circle codes
+      description: |
+        Valide un ensemble de circle codes et retourne :
+        - La clé Circle calculée (CLE) si tous les codes sont valides
+        - La liste des codes en erreur avec les détails si validation échouée
+
+        ⚠️ Cette validation est "à blanc" (sans commande associée)
+      operationId: validateCircleCodes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                version:
+                  type: string
+                  description: Version des règles de validation
+                  example: "11"
+                circle_values:
+                  type: object
+                  description: Objet contenant les circle codes et leurs valeurs
+                  additionalProperties: true
+                  example:
+                    C0: "11"
+                    C1: "A0"
+                    C2: "6"
+                    C10: "5238A0"
+                    C11: "2017"
+              required:
+                - circle_values
+      responses:
+        "200":
+          description: Validation effectuée (succès ou échec)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ValidationSuccess"
+                  - $ref: "#/components/schemas/ValidationError"
+              examples:
+                success:
+                  summary: Validation réussie
+                  value:
+                    circle_key: "038"
+                    circle_code:
+                      - circle_code: "C0"
+                        circle_value: "11"
+                        label: "Version"
+                        value: "Version 11"
+                        valid: true
+                      - circle_code: "C1"
+                        circle_value: "A0"
+                        label: "Famille"
+                        value: "Vin tranquille"
+                        valid: true
+                error:
+                  summary: Codes invalides
+                  value:
+                    errors: ["C0", "C1", "CLE"]
+                    circle_code:
+                      - circle_code: "C0"
+                        circle_value: "99"
+                        label: "Version"
+                        value: "99"
+                        valid: false
+                        errors:
+                          - "La valeur '99' de C0 n'existe pas en base."
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/orders:
+    post:
+      tags:
+        - Orders
+      summary: Créer une commande
+      description: |
+        Crée une nouvelle commande avec le statut 'nouvelle_commande'.
+
+        ## Règles importantes
+        - Seul l'acheteur (buyer) peut créer une commande
+        - Le statut doit être 'nouvelle_commande'
+        - Au moins une order_line est obligatoire
+        - Les circle codes de chaque ligne doivent être valides
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order:
+                  $ref: "#/components/schemas/OrderInput"
+            example:
+              order:
+                order_reference: "ORD-2026-001"
+                buyer_id: "code4good"
+                seller_id: "circle"
+                status: "nouvelle_commande"
+                note: "Commande urgente"
+                latest_instruction_due_date: "2026-02-15"
+                estimated_availability_earliest_at: "2026-03-01"
+                order_lines_attributes:
+                  - circle_code:
+                      C0: "11"
+                      CLE: "038"
+                      C1: "A0"
+                      C2: "6"
+                      C10: "5238A0"
+                      C11: "2017"
+      responses:
+        "201":
+          description: Commande créée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Accès interdit (vous devez être l'acheteur)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "Forbidden : You must be the buyer to create an order"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+    get:
+      tags:
+        - Orders
+      summary: Lister les commandes
+      description: |
+        Retourne la liste des commandes accessibles par le partenaire authentifié.
+
+        ⚠️ Endpoint non complètement implémenté (manque vue jbuilder)
+      operationId: listOrders
+      responses:
+        "200":
+          description: Liste des commandes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/orders/{order_reference}:
+    get:
+      tags:
+        - Orders
+      summary: Récupérer une commande
+      description: |
+        Récupère les détails d'une commande par sa référence.
+
+        ⚠️ Endpoint non complètement implémenté (manque vue jbuilder)
+      operationId: getOrder
+      parameters:
+        - name: order_reference
+          in: path
+          required: true
+          description: Référence unique de la commande
+          schema:
+            type: string
+          example: "ORD-2026-001"
+      responses:
+        "200":
+          description: Détails de la commande
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: "#/components/schemas/Order"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Commande non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "Order not found"
+
+    patch:
+      tags:
+        - Orders
+      summary: Mettre à jour une commande
+      description: |
+        Met à jour une commande existante.
+
+        ## Règles importantes
+        - L'acheteur et le vendeur peuvent mettre à jour selon les statuts
+        - Les transitions de statuts sont contrôlées (voir ALLOWED_TRANSITIONS)
+        - Le volume total des order_lines ne peut pas changer après création
+        - La order_reference ne peut pas être modifiée
+
+        ## Modification des order_lines
+        - Possible seulement dans certains statuts
+        - Les order_lines sont remplacées complètement (pas de mise à jour partielle)
+        - Le volume total par groupe (C10/C11) doit rester identique
+      operationId: updateOrder
+      parameters:
+        - name: order_reference
+          in: path
+          required: true
+          description: Référence unique de la commande
+          schema:
+            type: string
+          example: "ORD-2026-001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order:
+                  $ref: "#/components/schemas/OrderUpdate"
+            examples:
+              updateStatus:
+                summary: Changer le statut
+                value:
+                  order:
+                    status: "en_attente_demande_de_mise"
+                    note: "En attente de confirmation"
+              updateOrderLines:
+                summary: Remplacer les order_lines
+                value:
+                  order:
+                    order_lines_attributes:
+                      - circle_code:
+                          C0: "11"
+                          CLE: "038"
+                          C1: "A0"
+                          C2: "6"
+                          C10: "5238A0"
+                          C11: "2017"
+      responses:
+        "200":
+          description: Commande mise à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Action interdite (statut non autorisé, modification order_lines impossible, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                statusNotAllowed:
+                  value:
+                    error: "Forbidden : Status 'confirmee' is not allowed for your role"
+                orderLinesLocked:
+                  value:
+                    error: "Forbidden : Les order_lines ne peuvent pas être modifiées pour ce statut"
+        "404":
+          description: Commande non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/products:
+    get:
+      tags:
+        - Products
+      summary: Lister tous les produits
+      description: |
+        Retourne la liste complète des produits du catalogue Circle.
+
+        Le catalogue contient ~9500 produits avec toutes leurs caractéristiques.
+      operationId: listProducts
+      responses:
+        "200":
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/products/{c10}:
+    get:
+      tags:
+        - Products
+      summary: Récupérer un produit
+      description: |
+        Récupère les détails d'un produit par son code C10.
+      operationId: getProduct
+      parameters:
+        - name: c10
+          in: path
+          required: true
+          description: Code C10 du produit
+          schema:
+            type: string
+          example: "5238A0"
+      responses:
+        "200":
+          description: Détails du produit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product:
+                    $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Produit non trouvé (retourne un produit avec des valeurs nulles)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product:
+                    type: object
+                    nullable: true
+
+  /api/v1/search_circle_values:
+    post:
+      tags:
+        - Circle Values
+      summary: Rechercher des circle values
+      description: |
+        Recherche et retourne des valeurs Circle (codes secondaires) en fonction des valeurs d'entrée (codes principaux).
+
+        ## Champs obligatoires
+        - `C0` (Version)
+        - `CLE` (Clé Circle - doit être valide)
+        - `C10` (Code produit)
+        - `C11` (Millésime)
+
+        ## Dépendances
+        Certains codes recherchés nécessitent des champs supplémentaires dans input_values :
+        - C6, C7, C8, C9, C39D → nécessitent C1, C2, C3, C4, C5, C13
+        - C15-C25, C37C → nécessitent C13
+
+        ## Utilisation
+        Permet d'enrichir les order_lines d'une commande avec des informations supplémentaires.
+      operationId: searchCircleValues
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input_values:
+                  type: object
+                  description: Codes Circle d'entrée (connus)
+                  additionalProperties: true
+                  example:
+                    C0: "11"
+                    CLE: "038"
+                    C1: "A0"
+                    C2: "6"
+                    C3: "A1"
+                    C4: "A0"
+                    C5: "00"
+                    C10: "5238A0"
+                    C11: "2017"
+                    C13: "A7"
+                searched_values:
+                  type: array
+                  description: Liste des codes Circle à rechercher
+                  items:
+                    type: string
+                  example: ["C6", "C7", "C8", "C9"]
+              required:
+                - input_values
+                - searched_values
+      responses:
+        "200":
+          description: Valeurs Circle trouvées
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  circle_values:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        label:
+                          type: string
+                          description: Label du code Circle
+                        value:
+                          type: string
+                          description: Valeur brute
+                        circle_value:
+                          type: string
+                          description: Valeur lisible (label de l'enum)
+              example:
+                circle_values:
+                  C6:
+                    label: "Contenance de la bouteille"
+                    value: "9500"
+                    circle_value: "Magnum 1,5L"
+                  C7:
+                    label: "Volume total bouteilles"
+                    value: "330"
+                    circle_value: "330"
+        "400":
+          description: Requête invalide (champs manquants, clé invalide, dépendances manquantes)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                missingFields:
+                  value:
+                    error: "Champs obligatoires manquants: CLE, C10, C11"
+                invalidKey:
+                  value:
+                    error: "Clé Circle invalide"
+                missingDependencies:
+                  value:
+                    error: "Le code C6 nécessite les champs suivants dans input_values: C1, C2, C3, C4, C5, C13"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Aucune donnée trouvée pour les valeurs d'entrée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "Aucune donnée trouvée pour les valeurs d'entrée"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token d'authentification fourni par un partner
+
+  schemas:
+    # ==================== Validation ====================
+    ValidationSuccess:
+      type: object
+      properties:
+        circle_key:
+          type: string
+          description: Clé Circle calculée (CLE)
+          example: "038"
+        circle_code:
+          type: array
+          description: Résultats de validation pour chaque code
+          items:
+            $ref: "#/components/schemas/CircleCodeResult"
+
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: Liste des codes en erreur
+          items:
+            type: string
+          example: ["C0", "C1", "CLE"]
+        circle_code:
+          type: array
+          description: Résultats de validation détaillés
+          items:
+            $ref: "#/components/schemas/CircleCodeResult"
+
+    CircleCodeResult:
+      type: object
+      properties:
+        circle_code:
+          type: string
+          description: Code Circle (C0, C1, etc.)
+          example: "C0"
+        circle_value:
+          description: Valeur brute du code
+          oneOf:
+            - type: string
+            - type: number
+            - type: array
+          example: "11"
+        label:
+          type: string
+          description: Label du code Circle
+          example: "Version"
+        value:
+          description: Valeur lisible (label de l'enum ou valeur transformée)
+          oneOf:
+            - type: string
+            - type: number
+            - type: array
+          example: "Version 11"
+        valid:
+          type: boolean
+          description: Le code est-il valide ?
+          example: true
+        errors:
+          type: array
+          description: Messages d'erreur si le code est invalide
+          items:
+            type: string
+          example: ["La valeur '99' de C0 n'existe pas en base."]
+
+    # ==================== Orders ====================
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID de la commande
+          example: 1
+        order_reference:
+          type: string
+          description: Référence unique de la commande
+          example: "ORD-2026-001"
+        initial_order_reference:
+          type: string
+          nullable: true
+          description: Référence d'une commande précédente (si modification)
+          example: "ORD-2025-999"
+        buyer_id:
+          type: string
+          description: Code du partenaire acheteur
+          example: "code4good"
+        seller_id:
+          type: string
+          description: Code du partenaire vendeur
+          example: "circle"
+        status:
+          type: string
+          enum:
+            - nouvelle_commande
+            - en_attente_demande_de_mise
+            - demande_de_mise_et_logistique_en_cours
+            - details_de_mise_et_logistique_confirmes
+            - bon_de_commande
+            - mise_a_disposition
+            - bon_de_livraison
+            - commande_cloturee
+            - annulee_acheteur
+            - annulee_vendeur
+            - annulee
+          description: Statut de la commande
+          example: "nouvelle_commande"
+        previous_status:
+          type: integer
+          nullable: true
+          description: Statut précédent (pour annulation)
+        note:
+          type: string
+          nullable: true
+          description: Note ou commentaire
+          example: "Commande urgente"
+        accompanying_document_url:
+          type: string
+          format: uri
+          nullable: true
+          description: URL HTTPS d'un document accompagnant la commande
+          example: "https://example.com/doc.pdf"
+        latest_instruction_due_date:
+          type: string
+          format: date
+          nullable: true
+          description: Date limite d'instruction de mise
+          example: "2026-02-15"
+        estimated_availability_earliest_at:
+          type: string
+          format: date
+          nullable: true
+          description: Date de mise à disposition estimée au plus tôt
+          example: "2026-03-01"
+        order_lines:
+          type: array
+          description: Lignes de commande
+          items:
+            $ref: "#/components/schemas/OrderLine"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-01-15T15:45:00Z"
+
+    OrderInput:
+      type: object
+      required:
+        - order_reference
+        - buyer_id
+        - seller_id
+        - status
+        - order_lines_attributes
+      properties:
+        order_reference:
+          type: string
+          description: Référence unique de la commande
+          example: "ORD-2026-001"
+        initial_order_reference:
+          type: string
+          description: Référence d'une commande précédente
+          example: "ORD-2025-999"
+        buyer_id:
+          type: string
+          description: Code du partenaire acheteur
+          example: "code4good"
+        seller_id:
+          type: string
+          description: Code du partenaire vendeur
+          example: "circle"
+        status:
+          type: string
+          enum: [nouvelle_commande]
+          description: Doit être 'nouvelle_commande' pour une création
+          example: "nouvelle_commande"
+        note:
+          type: string
+          description: Note ou commentaire
+          example: "Commande urgente"
+        accompanying_document_url:
+          type: string
+          format: uri
+          description: URL HTTPS d'un document
+          example: "https://example.com/doc.pdf"
+        latest_instruction_due_date:
+          type: string
+          format: date
+          description: Date limite d'instruction (future ou aujourd'hui)
+          example: "2026-02-15"
+        estimated_availability_earliest_at:
+          type: string
+          format: date
+          description: Date de mise à disposition estimée (future ou aujourd'hui)
+          example: "2026-03-01"
+        order_lines_attributes:
+          type: array
+          description: Lignes de commande (minimum 1)
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/OrderLineInput"
+
+    OrderUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Nouveau statut (doit respecter les transitions autorisées)
+          example: "en_attente_demande_de_mise"
+        note:
+          type: string
+          description: Note ou commentaire
+          example: "Mise à jour de la commande"
+        accompanying_document_url:
+          type: string
+          format: uri
+          description: URL HTTPS d'un document
+        latest_instruction_due_date:
+          type: string
+          format: date
+          description: Date limite d'instruction
+        estimated_availability_earliest_at:
+          type: string
+          format: date
+          description: Date de mise à disposition estimée
+        order_lines_attributes:
+          type: array
+          description: Nouvelles order_lines (remplace toutes les anciennes)
+          items:
+            $ref: "#/components/schemas/OrderLineInput"
+
+    OrderLine:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID de la ligne
+          example: 1
+        circle_code:
+          type: object
+          description: Codes Circle de la ligne
+          additionalProperties: true
+          example:
+            C0: "11"
+            CLE: "038"
+            C1: "A0"
+            C10: "5238A0"
+            C11: "2017"
+
+    OrderLineInput:
+      type: object
+      required:
+        - circle_code
+      properties:
+        circle_code:
+          type: object
+          description: Codes Circle (doivent être valides)
+          additionalProperties: true
+          example:
+            C0: "11"
+            CLE: "038"
+            C1: "A0"
+            C2: "6"
+            C10: "5238A0"
+            C11: "2017"
+
+    # ==================== Products ====================
+    Product:
+      type: object
+      properties:
+        c10:
+          type: string
+          description: Code produit Circle
+          example: "5238A0"
+        label:
+          type: string
+          description: Étiquette complète du produit
+          example: "CHATEAU GAZIN, POMEROL, ROUGE"
+        family:
+          type: string
+          description: Famille du produit
+          example: "Vin"
+        product_type:
+          type: string
+          description: Type de produit
+          example: "Tranquille"
+        product_complement:
+          type: string
+          nullable: true
+          description: Complément du produit
+        country:
+          type: string
+          description: Pays
+          example: "France"
+        region:
+          type: string
+          description: Région
+          example: "Bordeaux"
+        subregion:
+          type: string
+          nullable: true
+          description: Sous-région
+          example: "Pomerol"
+        origin_sign:
+          type: string
+          nullable: true
+          description: Signe de l'origine
+          example: "AOP"
+        origin:
+          type: string
+          nullable: true
+          description: Origine
+        mention:
+          type: string
+          nullable: true
+          description: Mention
+        name:
+          type: string
+          description: Nom du produit
+          example: "GAZIN"
+        label_complement:
+          type: string
+          nullable: true
+          description: Complément d'étiquette / Cuvée
+        classification:
+          type: string
+          nullable: true
+          description: Classement / Appellation
+          example: "Pomerol"
+        classification_detail:
+          type: string
+          nullable: true
+          description: Détail du classement / Climat
+        bottler:
+          type: string
+          nullable: true
+          description: Producteur / Embouteilleur
+          example: "Château Gazin"
+        color:
+          type: string
+          description: Couleur
+          example: "ROUGE"
+        starting_vintage:
+          type: string
+          nullable: true
+          description: Premier millésime (ou 'ND')
+          example: "1990"
+        late_vintage:
+          type: string
+          nullable: true
+          description: Dernier millésime (ou 'ND')
+          example: "2023"
+        excluded_vintages:
+          description: Millésimes non produits (plages ou années)
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          nullable: true
+          example: "2003-2007, 2013"
+
+    # ==================== Errors ====================
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Message d'erreur
+          example: "Order not found"
+
+    ValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: object
+          description: Erreurs de validation par champ
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            order_reference: ["ne peut pas être vide"]
+            buyer_id: ["ne peut pas être vide"]
+            order_lines: ["doit contenir au moins 1 ligne"]
+
+  responses:
+    Unauthorized:
+      description: Non authentifié (token manquant ou invalide)
+      content:
+        application/json:
+          schema:
+            type: object
+            nullable: true
+
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    ValidationError:
+      description: Erreurs de validation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrors"
