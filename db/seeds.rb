@@ -4,7 +4,7 @@ puts "Création de l'utilisateur admin..."
 
 User.destroy_all
 
-User.create!(admin: true, email: "dev@langagecircle.fr", password: 'LangageCircle2026!', password_confirmation: 'macpass')
+User.create!(admin: true, email: "dev@langagecircle.fr", password: 'LangageCircle2026!', password_confirmation: 'LangageCircle2026!')
 
 puts "Utilisateur admin créé"
 
